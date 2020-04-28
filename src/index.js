@@ -1,22 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo'
-import ApolloClient from "apollo-boost";
+import { ApolloClient } from 'apollo-client'
+import { createHttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import gql from "graphql-tag";
 
 import './styles/index.css'
 import App from './components/App'
 import * as serviceWorker from './serviceWorker';
 
-const client = new ApolloClient({
+const httpLink = createHttpLink({
   uri: 'https://morning-sands-20248.herokuapp.com/',
+})
+
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
   onError: ({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
-      // graphQLErrors固有の処理
       console.log(graphQLErrors.toString())
     }
     if (networkError) {
-      // networkError固有の処理
       console.log(networkError.toString())
     }
   }
