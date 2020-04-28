@@ -4,8 +4,8 @@ import { ApolloProvider } from 'react-apollo'
 import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 
-import './index.css';
-import App from './App';
+import './styles/index.css'
+import App from './components/App'
 import * as serviceWorker from './serviceWorker';
 
 const client = new ApolloClient({
