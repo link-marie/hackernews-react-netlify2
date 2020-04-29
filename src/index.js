@@ -65,7 +65,6 @@ const client = new ApolloClient({
   }
 });
 
-
 const query = gql`
   {
     info
