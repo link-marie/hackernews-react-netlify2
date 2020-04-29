@@ -49,6 +49,33 @@ const NEW_LINKS_SUBSCRIPTION = gql`
   }
 `
 
+const NEW_VOTES_SUBSCRIPTION = gql`
+  subscription {
+    newVote {
+      id
+      link {
+        id
+        url
+        description
+        createdAt
+        postedBy {
+          id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
+        }
+      }
+      user {
+        id
+      }
+    }
+  }
+`
+
 class LinkList extends Component {
   render() {
 
@@ -68,6 +95,7 @@ class LinkList extends Component {
 
           // 新しいLink投稿時のイベント
           this._subscribeToNewLinks(subscribeToMore)
+          this._subscribeToNewVotes(subscribeToMore)
 
           /* 取得したデータ */
           const linksToRender = data.feed.links
@@ -150,6 +178,18 @@ class LinkList extends Component {
           }
         })
       }
+    })
+  }
+
+  /**
+   新しい評価が行われた時、Client上で自動更新されるようにする
+   */
+  _subscribeToNewVotes = subscribeToMore => {
+    subscribeToMore({
+      // Subscription実行時の処理。
+      // 新規評価を問い合わせる
+      // Clientで評価が自動更新される
+      document: NEW_VOTES_SUBSCRIPTION
     })
   }
 
