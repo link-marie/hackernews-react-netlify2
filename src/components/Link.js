@@ -42,15 +42,21 @@ class Link extends Component {
             <Mutation 
               mutation={VOTE_MUTATION}
               variables={{linkId: this.props.link.id}}
-            >
+              update={ (store, { data: {vote}}) => 
+                this.props.updateCacheAfterVote(store, vote, this.props.link.id)
+              }
+              >
+              { /* RenderPropFunction の定義 
+                clickで関数を呼び出せるようにする
+              */}
               {voteMutation => (
                 <div className="ml1 gray f11" onClick={voteMutation}>
                   ▲
                 </div>
               )}
             </Mutation>
-          )}
 
+          )}
         </div>
         <div className="ml1">
 
@@ -69,6 +75,8 @@ class Link extends Component {
             {this.props.link.postedBy
               ? this.props.link.postedBy.name
               : 'Unknown'}{' '}
+
+            {/* 投稿経過時間 */}
             {timeDifferenceForDate(this.props.link.createdAt)}
           </div>
         </div>
