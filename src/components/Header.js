@@ -6,9 +6,9 @@ import { AUTH_TOKEN } from '../constants'
 class Header extends Component {
 
   render() {
- 
+    // 内部メモリよりtoken読み込み
     const authToken = localStorage.getItem(AUTH_TOKEN)
- 
+
     return (
       <div className="flex pa1 justify-between nowrap orange">
         <div className="flex flex-fixed black">
@@ -16,15 +16,32 @@ class Header extends Component {
           <Link to="/" className="ml1 no-underline black">
             new
           </Link>
+
           <div className="ml1">|</div>
-          <Link to="/create" className="ml1 no-underline black">
-            submit
+
+          {/* Search */}
+          <Link to="/search" className="ml1 no-underline black">
+            search
           </Link>
+
+          {/* 投稿 */}
+          {authToken && (
+            <div className="flex">
+              <div className="ml1">|</div>
+              <Link to="/create" className="ml1 no-underline black">
+                submit
+            </Link>
+            </div>
+          )}
+
         </div>
 
         <div className="flex flex-fixed">
-        {authToken ? (
 
+          {/* Login状態? */}
+          {authToken ? (
+
+            // LogOut
             <div
               className="ml1 pointer black"
               onClick={() => {
@@ -35,6 +52,8 @@ class Header extends Component {
               logout
             </div>
           ) : (
+
+              // LogIn
               <Link to="/login" className="ml1 no-underline black">
                 login
               </Link>
