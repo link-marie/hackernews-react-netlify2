@@ -17,12 +17,14 @@ import { AUTH_TOKEN } from './constants'
 import App from './components/App'
 import * as serviceWorker from './serviceWorker';
 
+const endPoint = "morning-sands-20248.herokuapp.com"
+
 const httpLink = createHttpLink({
-  uri: 'https://morning-sands-20248.herokuapp.com/',
+  uri: 'https://' + endPoint + '/',
 })
 
 const wsLink = new WebSocketLink({
-  uri: 'wss://morning-sands-20248.herokuapp.com/',
+  uri: 'wss://' + endPoint + '/',
   options: {
     reconnect: true,
     connectionParams: {
