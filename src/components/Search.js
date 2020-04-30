@@ -28,10 +28,14 @@ const FEED_SEARCH_QUERY = gql`
 `
 
 class Search extends Component {
+
   state = {
+    // 検索結果
     links: [],
+    // 検索語
     filter: '',
   }
+
   render() {
     return (
       <div>
@@ -53,19 +57,28 @@ class Search extends Component {
             link={link}
             index={index} />
         ))}
+
       </div>
     )
   }
 
+  /*
+  検索実行
+  */
   _executeSearch = async () => {
+    // 検索語取得
     const { filter } = this.state
+    // withApolloで取得した client オブジェクトを使って queryする
     const result = await this.props.client.query({
       query: FEED_SEARCH_QUERY,
       variables: { filter },
     })
+    // 結果取得
     const links = result.data.feed.links
+    // 内部に保存
     this.setState({ links })
   }
 }
 
+// withApolloを使って
 export default withApollo(Search)
