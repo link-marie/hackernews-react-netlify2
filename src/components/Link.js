@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 import { AUTH_TOKEN } from '../constants'
 import { timeDifferenceForDate } from '../utils'
 
+// Vote実行
 const VOTE_MUTATION = gql`
   mutation VoteMutation($linkId: ID!) {
     vote(linkId: $linkId) {
@@ -26,6 +27,7 @@ const VOTE_MUTATION = gql`
 `
 
 class Link extends Component {
+
   render() {
 
     const authToken = localStorage.getItem(AUTH_TOKEN)
