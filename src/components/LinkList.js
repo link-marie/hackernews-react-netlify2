@@ -121,7 +121,7 @@ class LinkList extends Component {
                   key={link.id}
                   link={link}
                   index={index + pageIndex}
-                  updateStoreAfterVote={this._updateCacheAfterVote}
+                  updateStoreAfterVote={this._updateCacheAfterVote1}
                 />
               ))}
 
@@ -150,7 +150,7 @@ class LinkList extends Component {
   /**
    Vote/Unvote 実行後の 内部Cacheの update
    */
-  _updateCacheAfterVote = (store, remote, linkId) => {
+  _updateCacheAfterVote1 = (store, remote, linkId) => {
 
     const isNewPage = this.props.location.pathname.includes('new')
     const page = parseInt(this.props.match.params.page, 10)
@@ -238,40 +238,76 @@ class LinkList extends Component {
    Page用パラメータの取得
    */
   _getQueryVariables = () => {
-    const isNewPage = this.props.location.pathname.includes('new')
-    const page = parseInt(this.props.match.params.page, 10)
 
-    const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
-    const first = isNewPage ? LINKS_PER_PAGE : 100
-    const orderBy = isNewPage ? 'createdAt_DESC' : null
+    // listを いくつskipして検索を開始するか
+    let skip = 0
+    // skipした位置からいくつ linkを取得するか
+    let first = 100
+    // listの並び替え
+    let orderBy = null
+
+    // 新規投稿ページか
+    const isNewPage = this.props.location.pathname.includes('new')
+    if (isNewPage) {
+      // routerより 現在のページ番号を得る(10進数で)
+      const page = parseInt(this.props.match.params.page, 10)
+
+      skip = (page - 1) * LINKS_PER_PAGE
+      first = LINKS_PER_PAGE
+      orderBy = 'createdAt_DESC'
+    }
+
     return { first, skip, orderBy }
   }
 
+  /**
+   * 表示するデータを得る
+   */
   _getLinksToRender = data => {
+    // 新規投稿ページか
     const isNewPage = this.props.location.pathname.includes('new')
-    if( isNewPage){
+    if( isNewPage) {
+      // linkデータをそのまま参照
       return data.feed.links
     }
+
+    // Sortするためshallow copy
     const rankedLinks = data.feed.links.slice()
-    rankedLinks.sort( (l1, l2) => l2.votes.length - l1.votes.length )
+    // Vote数でソート
+    rankedLinks.sort((l1, l2) => l2.votes.length - l1.votes.length)
     return rankedLinks
   }
 
+  /**
+   次のページへ移動
+   */
   _nextPage = data => {
+    // 現在のページ番号を得る
     const page = parseInt(this.props.match.params.page, 10)
+    // 次のページがある?
     if( page <= data.feed.count / LINKS_PER_PAGE) {
+      // 次のページを設定
       const nextPage = page + 1
+      // Routeを指定
       this.props.history.push(`/new/${nextPage}`)
     }
   }
 
-  _previousPage = data => {
+  /**
+   前のページへ移動
+   */
+  _previousPage = () => {
+    // 現在のページ番号を得る
     const page = parseInt(this.props.match.params.page, 10)
+    // 前のページがある?
     if( page > 1) {
+      // 前のページを設定
       const previousPage = page - 1
+      // Routeを指定
       this.props.history.push(`/new/${previousPage}`)
     }
   }
+
 }
 
 export default LinkList
