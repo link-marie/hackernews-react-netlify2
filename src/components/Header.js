@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { withRouter } from 'react-router'
 import { AUTH_TOKEN } from '../constants'
 
+// 画面切り替えボタンを配置する画面ヘッダー領域
+// それぞれの routeに linkする
 class Header extends Component {
 
   render() {
@@ -13,17 +15,19 @@ class Header extends Component {
       <div className="flex pa1 justify-between nowrap orange">
         <div className="flex flex-fixed black">
           <div className="fw7 mr1">HackerNews</div>
+
+          {/* 新規投稿ページ */}
           <Link to="/" className="ml1 no-underline black">
             new
           </Link>
 
           <div className="ml1">|</div>
-          
-          {/* Top */}
+
+          {/* Top10 votes */}
           <Link to="/top" className="ml1 no-underline black">
             top
           </Link>
-          
+
           <div className="ml1">|</div>
 
           {/* Search */}
