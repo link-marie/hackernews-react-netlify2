@@ -7,6 +7,7 @@ import { LINKS_PER_PAGE } from '../constants'
 
 // GraphQL queryを gqlで GraphQL ASTへ変換
 export const FEED_QUERY = gql`
+
   query FeedQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
     feed(first: $first, skip: $skip, orderBy: $orderBy) {
       links {
@@ -94,7 +95,7 @@ class LinkList extends Component {
         */}
         {({ loading, error, data, subscribeToMore }) => {
           /* データ取得中? */
-          if (loading) return <div>Loading..</div>
+          if (loading) return <div>Fetching..</div>
           /* データ取得できない? */
           if (error) return <div>Error</div>
 
@@ -102,9 +103,11 @@ class LinkList extends Component {
           this._subscribeToNewLinks(subscribeToMore)
           this._subscribeToNewVotes(subscribeToMore)
 
-          /* 取得したデータ */
+          /* 表示データ */
           const linksToRender = this._getLinksToRender(data)
+          // 新規投稿ページかどうか
           const isNewPage = this.props.location.pathname.includes('new')
+          // 現在のページ番号より リンクのindexのオフセットを求める
           const pageIndex = this.props.match.params.page
             ? (this.props.match.params.page - 1) * LINKS_PER_PAGE
             : 0
@@ -121,7 +124,9 @@ class LinkList extends Component {
                   updateStoreAfterVote={this._updateCacheAfterVote}
                 />
               ))}
+
               {isNewPage && (
+                /** Navigation */
                 <div className="flex ml4 mv3 gray">
                   <div className="pointer mr2"
                     onClick={() => this._previousPage()}
@@ -143,13 +148,14 @@ class LinkList extends Component {
   }
 
   /**
-   Vote実行後の 内部Cacheの update
+   Vote/Unvote 実行後の 内部Cacheの update
    */
   _updateCacheAfterVote = (store, remote, linkId) => {
-    
+
     const isNewPage = this.props.location.pathname.includes('new')
     const page = parseInt(this.props.match.params.page, 10)
 
+    // ページ表示パラメータ
     const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
     const first = isNewPage ? LINKS_PER_PAGE : 100
     const orderBy = isNewPage ? 'createdAt_DESC' : null
@@ -228,6 +234,9 @@ class LinkList extends Component {
     })
   }
 
+  /**
+   Page用パラメータの取得
+   */
   _getQueryVariables = () => {
     const isNewPage = this.props.location.pathname.includes('new')
     const page = parseInt(this.props.match.params.page, 10)

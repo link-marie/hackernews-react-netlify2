@@ -13,6 +13,7 @@ class App extends Component {
       <div className="center w85">
         <Header />
         <div className="ph3 pv1 background-gray">
+          {/* 入力された addressにしたがって route を分岐 */}
           <Switch>
             <Route exact path="/" render={ () => <Redirect to="/new/1" /> } />
             <Route exact path="/create" component={CreateLink} />
