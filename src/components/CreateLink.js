@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import { FEED_QUERY } from './LinkList'
-import { LINKS_PER_PAGE } from '../constants';
+import { LINKS_PER_PAGE } from '../constants'
 
+// GraphQL AST
 const POST_MUTATION = gql`
   mutation PostMutation($description: String!, $url: String!) {
     post(description: $description, url: $url) {
@@ -16,15 +17,19 @@ const POST_MUTATION = gql`
 `
 
 class CreateLink extends Component {
+
+  // 内部記憶領域の定義
   state = {
     description: '',
     url: '',
   }
 
   render() {
+    // 内部 state
     const { description, url } = this.state
 
     return (
+      // 投稿入力領域
       <div>
         <div className="flex flex-column mt3">
           <input
@@ -43,39 +48,73 @@ class CreateLink extends Component {
           />
         </div>
 
+        {/* 
+          POST_MUTATIONを prop 'mutation' として <Mutation />に与える 
+        */}
         <Mutation
+          // GraphQL AST or DocumentNode
           mutation={POST_MUTATION} 
+          // 変数
           variables={{ description, url }}
-          onCompleted={ () => this.props.history.push('/new/1') }
-          update={ (store, { data: { post }}) => {
 
-            const first = LINKS_PER_PAGE
-            const skip = 0
-            const orderBy = 'createdAt_DESC'
-            const data = store.readQuery( {
-              query: FEED_QUERY,
-              variables: { first, skip, orderBy }
-            })
-            data.feed.links.unshift(post)
-            store.writeQuery({
-              query: FEED_QUERY,
-              data,
-              variables: { first, skip, orderBy }
-            })
+          // 新規投稿内容を内部キャッシュに反映
+          // Serverが応答を返した直後に呼び出される
+          // store: 現在のキャッシュ
+          // data: mutation成果
+          update={ (store, {data: {post}}) => {
+            this.postUpdate(store, post)
           }}
-        >
-          {postMutation =>
-            <button
-              onClick={
-                postMutation
-              }>
-              submit
-            </button>
+
+          // Mutationが成功した時に実行する処理
+          onCompleted={
+            () => {
+              this.postCompleted()
+            }
           }
+         >
+
+          { /* RenderPropFunction の定義 */}
+          { (funcMutation) => (
+            // 投稿ボタン
+            <button onClick={
+              funcMutation
+              }>
+              Submit
+            </button>
+          )}
         </Mutation>
       </div>
-    );
+    )
   }
+
+  postUpdate(store, post) {
+
+    const first = LINKS_PER_PAGE
+    const skip = 0
+    const orderBy = 'createdAt_DESC'
+
+    // 現在のCacheから 内部データを読み込む
+    const data = store.readQuery({
+      query: FEED_QUERY,
+      variables: { first, skip, orderBy }
+    })
+    // 投稿を最初に追加
+    data.feed.links.unshift(post)
+    // 内部Cacheを更新
+    store.writeQuery({
+      query: FEED_QUERY,
+      data,
+      variables: { first, skip, orderBy }
+    })
+
+    // console.log('post update')
+  }
+
+  postCompleted() {
+    this.props.history.push('/new/1')
+    // console.log('postCompleted')
+  }
+
 }
 
-export default CreateLink;
+export default CreateLink
